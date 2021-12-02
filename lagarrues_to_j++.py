@@ -11,7 +11,7 @@ punctuation_pattern = r'(\s?[!%&\'\(\)$#\"\/\\*+,-.:;<=>?@\[\]^_´{|}~]\s?)'
 initial_pattern = re.compile(r'^(kho?|[nctkp]h|ngh|ng|quo?|qu|ko|gi|[mnbptkchvgsdlx])(?=[aeoiuyăâđêôơư])')
 initial_conversion = {
     'm': 'm', 'n': 'n', 'nh': 'nj', 'ng': 'ng', 'ngh': 'ng',
-    'b': 'b', 'p': 'b', 't': 'd', 'ch': 'z', 'k': 'g', 'c': 'g', 'qu': 'gv', 'quo': 'gvw', 'ko': 'gw',
+    'b': 'bb', 'p': 'b', 't': 'd', 'ch': 'z', 'k': 'g', 'c': 'g', 'qu': 'gv', 'quo': 'gvw', 'ko': 'gw',
     'th': 't', 'kh': 'k', 'kho': 'kw',
     'ph': 'f', 's': 's', 'h': 'h',
     'v': 'v', 'g': 'gh',
