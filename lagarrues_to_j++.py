@@ -1,17 +1,17 @@
 import unicodedata
 import re
 
-lagarrues = 'á ả a à ạ ã ọc chể ọc bao xìn chể xìn lồi'
-
-lagarrues = input('請輸入要轉換的句子：')
+# lagarrues = 'á ả a à ạ ã ọc chể ọc bao xìn chể xìn lồi'
+lagarrues = ''
+# lagarrues = input('請輸入要轉換的句子：')
 
 viet_special_char = 'ĂÂĐÊÔƠƯăâđêôơư'
 punctuation = r"[!%&'()$#\"/\*+,-.:;<=>?@[]^_´`{|}~]"
 punctuation_pattern = r'(\s?[!%&\'\(\)$#\"\/\\*+,-.:;<=>?@\[\]^_´{|}~]\s?)'
-initial_pattern = re.compile(r'^(kho?|[nctkp]h|ngh|ng|quo?|qu|ko|gi|[mnbptkchvgsdlx])(?=[aeoiuyăâđêôơư])')
+initial_pattern = re.compile(r'^(kho|[nctkp]h|ngh|ng|quo|qu|ko|gi|[mnbptkchvgsdlx])(?=[aeoiuyăâđêôơư])')
 initial_conversion = {
     'm': 'm', 'n': 'n', 'nh': 'nj', 'ng': 'ng', 'ngh': 'ng',
-    'b': 'b', 'p': 'b', 't': 'd', 'ch': 'z', 'k': 'g', 'c': 'g', 'qu': 'gv', 'quo': 'gvw', 'ko': 'gw',
+    'b': 'bb', 'p': 'b', 't': 'd', 'ch': 'z', 'k': 'g', 'c': 'g', 'qu': 'gv', 'quo': 'gvw', 'ko': 'gw',
     'th': 't', 'kh': 'k', 'kho': 'kw',
     'ph': 'f', 's': 's', 'h': 'h',
     'v': 'v', 'g': 'gh',
@@ -19,8 +19,14 @@ initial_conversion = {
     'l': 'l',
     'x': 'sl'
 }
+special_rime_conversion = {
+    'ai': 'aaij', 'ao': 'aao',
+    'âu': 'eauw',
+    'ui': 'uij',
+}
 rime_conversion = {
-    'a': 'aa', 'ai': 'aai', 'ao': 'aau', 'am': 'aam', 'an': 'aan', 'ang': 'aang', 'ap': 'aap', 'at': 'aat', 'ac': 'aak', 'ach': 'aakj',
+    'a': 'aa', 'ai': 'aai', 'ao': 'aau', 'am': 'aam', 'an': 'aan', 'ang': 'aang', 'ap': 'aap', 'at': 'aat', 'ac': 'aak',
+    'ach': 'aakj',
     'ay': 'ai', 'au': 'au',
     'ăi': 'arj',
     'ăy': 'ari', 'ău': 'aru', 'ăo': 'aro', 'ăm': 'am', 'ăn': 'an', 'ăng': 'ang', 'ăp': 'ap', 'ăt': 'at', 'ăc': 'ak',
@@ -73,37 +79,41 @@ lagarrues = re.sub(punctuation_pattern, r' \1 ', lagarrues)
 lagarrues_l = lagarrues.split(' ')
 converted = ''
 for word in lagarrues_l:
-    if word == '' or word in punctuation:
+    is_special_rime = False  # 判斷 特殊韻（聲調標在韻尾）
+    if word == '' or word in punctuation:  # 跳過符號
         converted += word + ' '
         continue
     print(word)
     decomposed_word = ['', '', '']
     for char in word:
         decomposed_char = unicodedata.decomposition(char)
-        if decomposed_char != '' and char not in viet_special_char:
-            decomposed_char_l = decompose_viet_char(char)
+        if decomposed_char != '' and char not in viet_special_char:  # 若 當前字符 是 帶調越南語字母
+            decomposed_char_l = decompose_viet_char(char)  # 分離聲調
             decomposed_word[1] += decomposed_char_l[0]
             decomposed_word[2] += decomposed_char_l[1]
-        else:
+            if word.find(char) == len(word) - 1:  # 若當前 帶聲調越南語字母 是 韻尾
+                is_special_rime = True
+        else:  # 否則跳過
             decomposed_word[1] += char
     decomposed_word[2] = tone_conversion[decomposed_word[2]]
-    initial = initial_pattern.match(decomposed_word[1])
-    if initial is not None:
+    initial = initial_pattern.match(decomposed_word[1])  # 正則匹配 lagarrues 聲母
+    if initial is not None:  # 若有聲母
         decomposed_word[0] = initial.group()
-        decomposed_word[1] = decomposed_word[1][len(decomposed_word[0]):]
-        decomposed_word[0] = initial_conversion[decomposed_word[0]]
-        if decomposed_word[1] in rime_conversion:
+        decomposed_word[1] = decomposed_word[1][len(decomposed_word[0]):]  # 拆分聲母與韻母
+        decomposed_word[0] = initial_conversion[decomposed_word[0]]  # 轉換聲母
+        if decomposed_word[1] in special_rime_conversion and is_special_rime:  # 先轉換特殊韻母
+            decomposed_word[1] = special_rime_conversion[decomposed_word[1]]
+        elif decomposed_word[1] in rime_conversion:  # 轉換韻母
             decomposed_word[1] = rime_conversion[decomposed_word[1]]
         else:
-            if initial.group() == 'gi':
-                decomposed_word[1] = rime_conversion['i' + decomposed_word[1]]
-            else:
-                raise RuntimeError('Error')
-    else:
-        decomposed_word[1] = rime_conversion[decomposed_word[1]]
-        if decomposed_word[1] == 'yng':
+            raise RuntimeError('Error')
+        if decomposed_word[0] == 'gh' and decomposed_word[1][0] == 'i':  # 處理 gìn > ghin 一類的情況，改成 jin
+            decomposed_word[0] = 'j'
+    else:  # 若無聲母
+        decomposed_word[1] = rime_conversion[decomposed_word[1]]  # 轉換韻母
+        if decomposed_word[1] == 'yng':  # 處理 有聲母時 ưng > yng 但 無聲母時 ưng > ng 的情況
             decomposed_word[1] = 'ng'
-    if decomposed_word[1][-1] in 'ptk' and decomposed_word[2] == '5':
+    if decomposed_word[1][-1] in 'ptk' and decomposed_word[2] == '5':  # 處理 入聲調 標成 5 的情況
         decomposed_word[2] = '6'
     converted += ''.join(decomposed_word) + ' '
     print(decomposed_word)
