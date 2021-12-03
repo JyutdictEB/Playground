@@ -22,7 +22,9 @@ initial_conversion = {
 special_rime_conversion = {
     'ai': 'aaij', 'ao': 'aao',
     'âu': 'eauw',
+    'ôi': 'ooij',
     'ui': 'uij',
+    'uy': 'wij',
 }
 rime_conversion = {
     'a': 'aa', 'ai': 'aai', 'ao': 'aau', 'am': 'aam', 'an': 'aan', 'ang': 'aang', 'ap': 'aap', 'at': 'aat', 'ac': 'aak',
@@ -84,7 +86,7 @@ for word in lagarrues_l:
         converted += word + ' '
         continue
     print(word)
-    decomposed_word = ['', '', '']
+    decomposed_word = ['', '', '']  # ['聲母', '韻母', '聲調']
     for char in word:
         decomposed_char = unicodedata.decomposition(char)
         if decomposed_char != '' and char not in viet_special_char:  # 若 當前字符 是 帶調越南語字母
@@ -110,10 +112,16 @@ for word in lagarrues_l:
         if decomposed_word[0] == 'gh' and decomposed_word[1][0] == 'i':  # 處理 gìn > ghin 一類的情況，改成 jin
             decomposed_word[0] = 'j'
     else:  # 若無聲母
-        decomposed_word[1] = rime_conversion[decomposed_word[1]]  # 轉換韻母
+        if decomposed_word[1] in special_rime_conversion and is_special_rime:  # 先轉換特殊韻母
+            decomposed_word[1] = special_rime_conversion[decomposed_word[1]]
+        elif decomposed_word[1] in rime_conversion:  # 轉換韻母
+            decomposed_word[1] = rime_conversion[decomposed_word[1]]
+        else:
+            raise RuntimeError('Error')
         if decomposed_word[1] == 'yng':  # 處理 有聲母時 ưng > yng 但 無聲母時 ưng > ng 的情況
             decomposed_word[1] = 'ng'
-    if decomposed_word[1][-1] in 'ptk' and decomposed_word[2] == '5':  # 處理 入聲調 標成 5 的情況
+    if (decomposed_word[1][-1] in 'ptk' or decomposed_word[1][-2:] == 'kj') and decomposed_word[2] == '5':
+        # 處理 入聲調 標成 5 的情況
         decomposed_word[2] = '6'
     converted += ''.join(decomposed_word) + ' '
     print(decomposed_word)
