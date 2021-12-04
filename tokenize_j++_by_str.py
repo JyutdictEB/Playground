@@ -1,9 +1,7 @@
 import re
 
-str = '稟爲 被 強劃 良田 溝基 古圳 乞恩 轉 告事 現時 村上處* 有田 lung4-gen2 底凹 ， 築(cuk1)起 溝基 *古圳 來水通 湆(jaam3)下處 田地 耕食 圖物，歷年 糧稅 還納'
-to_be_tokenize = 'ban2 veai4 bi4 kieeng4 vaat6 lieeng4 tin4 geau1 gi1 gu2 zan3 hak1 jan1 zin2 garu3 syu4 jin4 sli4 ' \
-                 'slin1 soeng4 sli3 jeau5 tin4 loong4 gen2 dai2 nap1 , slook1 hi2 geau1 gi1 gu2 zan3 looi4 slwi2 ' \
-                 'toong1 jam3 ha4 sli3 tin4 di4 gaang1 seek6 tu4 mat6 , leek6 nin4 lieeng4 slui3 vaan4 naap6'
+str = ''
+to_be_tokenize = ''
 
 tokenized = ''
 

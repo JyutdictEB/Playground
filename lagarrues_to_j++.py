@@ -1,9 +1,11 @@
 import unicodedata
 import re
 
-# lagarrues = 'á ả a à ạ ã ọc chể ọc bao xìn chể xìn lồi'
-lagarrues = 'gềnh'
-# lagarrues = input('請輸入要轉換的句子：')
+# 由文件 lagarrues_to_j++_input.txt 中讀入源數據
+with open('lagarrues_to_j++_input.txt', 'r', encoding='utf-8') as file:
+    lagarrues_to_jpp_input = file.read()
+
+lagarrues = re.sub('\n', '$', lagarrues_to_jpp_input)
 
 viet_special_char = 'ĂÂĐÊÔƠƯăâđêôơư'
 punctuation = r"[!%&'()$#\"/\*+,-.:;<=>?@[]^_´`{|}~]"
@@ -114,6 +116,8 @@ for word in lagarrues_l:
             raise RuntimeError('Error')
         if decomposed_word[0] == 'gh' and decomposed_word[1][0] == 'i':  # 處理 gìn > ghin 一類的情況，改成 jin
             decomposed_word[0] = 'j'
+        if decomposed_word[0] == 'j' and decomposed_word[1] == 'u':  # 處理 giù > ju 一類的情況，改成 jiu
+            decomposed_word[1] = 'iu'
     else:  # 若無聲母
         if decomposed_word[1] in special_rime_conversion and is_special_rime:  # 先轉換特殊韻母
             decomposed_word[1] = special_rime_conversion[decomposed_word[1]]
@@ -129,5 +133,10 @@ for word in lagarrues_l:
     converted += ''.join(decomposed_word) + ' '
     print(decomposed_word)
 
-print(lagarrues)
-print(converted)
+converted = re.sub(' +', ' ', converted)
+
+with open('lagarrues_to_j++_output.txt', 'w', encoding='utf-8') as file:
+    converted = re.sub(' \$ ', '\n', converted)
+    file.write(converted)
+
+print('轉換成功！已輸出到 lagarrues_to_j++_output.txt')
