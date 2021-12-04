@@ -2,7 +2,7 @@ import unicodedata
 import re
 
 # lagarrues = 'á ả a à ạ ã ọc chể ọc bao xìn chể xìn lồi'
-lagarrues = ''
+lagarrues = 'gềnh'
 # lagarrues = input('請輸入要轉換的句子：')
 
 viet_special_char = 'ĂÂĐÊÔƠƯăâđêôơư'
@@ -85,6 +85,9 @@ for word in lagarrues_l:
     if word == '' or word in punctuation:  # 跳過符號
         converted += word + ' '
         continue
+    if word == 'gềnh':  # 處理特殊情況 gềnh
+        converted += 'ghing4' + ' '
+        continue
     print(word)
     decomposed_word = ['', '', '']  # ['聲母', '韻母', '聲調']
     for char in word:
@@ -120,9 +123,9 @@ for word in lagarrues_l:
             raise RuntimeError('Error')
         if decomposed_word[1] == 'yng':  # 處理 有聲母時 ưng > yng 但 無聲母時 ưng > ng 的情況
             decomposed_word[1] = 'ng'
-    if (decomposed_word[1][-1] in 'ptk' or decomposed_word[1][-2:] == 'kj') and decomposed_word[2] == '5':
+    # if (decomposed_word[1][-1] in 'ptk' or decomposed_word[1][-2:] == 'kj') and decomposed_word[2] == '5':
         # 處理 入聲調 標成 5 的情況
-        decomposed_word[2] = '6'
+        # decomposed_word[2] = '6'
     converted += ''.join(decomposed_word) + ' '
     print(decomposed_word)
 
