@@ -8,12 +8,18 @@ with open('tokenize_j++_by_characters_characters_input.txt', 'r', encoding='utf-
 with open('tokenize_j++_by_characters_j++_input.txt', 'r', encoding='utf-8') as file:
     tokenize_jpp_by_characters_jpp_input = file.read()
 
-characters = tokenize_jpp_by_characters_characters_input.splitlines()
-jpp = tokenize_jpp_by_characters_jpp_input.splitlines()
+characters = re.sub('\*', '', tokenize_jpp_by_characters_characters_input)  # 去除「*」
+characters = re.sub('[a-zA-Z](.*?)[0-9]', '□', characters)  # 將 粵拼 轉成 方框
+characters = re.sub('-', '', characters)  # 去除「-」
+characters = re.sub('[(](.?)[)]', '', characters)  # 去除 英文圓括號 及 其中內容
+characters = characters.splitlines()
+
+jpp = re.sub(' - ', ' ', tokenize_jpp_by_characters_jpp_input)  # 去除 地名之間的「 - 」
+jpp = jpp.splitlines()
 
 output = []
 
-if len(characters) == len(jpp):
+if len(characters) == len(jpp):  # 確保行數對應
     for i in range(0, len(characters)):
         tokenized = ''
 
@@ -22,10 +28,6 @@ if len(characters) == len(jpp):
 
         curr_index = -1
         for token in split_characters:
-            token = re.sub('\*', '', token)  # 去除「*」
-            token = re.sub('[a-zA-Z](.*?)[0-9]', '□', token)  # 將 粵拼 轉成 方框
-            token = re.sub('-', '', token)  # 去除「-」
-            token = re.sub('[(](.*)[)]', '', token)  # 去除 英文圓括號 及 其中內容
             for i in range(0, len(token)):
                 curr_index += 1
                 tokenized += split_jpp[curr_index] + ' '
@@ -33,6 +35,11 @@ if len(characters) == len(jpp):
                 tokenized += '| '
 
         output.append(tokenized)
+
+        print(split_characters)
+        print(tokenized)
+        if len(''.join(split_characters)) != len(split_jpp):  # 確保每行的字數對應
+            raise RuntimeError('Error')
 
 # print(characters)
 # print(jpp)
