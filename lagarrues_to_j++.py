@@ -8,7 +8,7 @@ with open('lagarrues_to_j++_input.txt', 'r', encoding='utf-8') as file:
 lagarrues = re.sub('\n', '$', lagarrues_to_jpp_input)
 
 viet_special_char = 'ĂÂĐÊÔƠƯăâđêôơư'
-punctuation = r"[!%&'()$#\"/\*+,-.:;<=>?@[]^_´`{|}~]"
+punctuation = r"!%&'()$#\"/\*+,-.:;<=>?@[]^_´`{|}~"
 punctuation_pattern = r'(\s?[!%&\'\(\)$#\"\/\\*+,-.:;<=>?@\[\]^_´{|}~]\s?)'
 initial_pattern = re.compile(r'^(kho|[nctkp]h|ngh|ng|quo|qu|ko|gi|[mnbptkchvgsdlx])(?=[aeoiuyăâđêôơư])')
 initial_conversion = {
@@ -136,7 +136,7 @@ for word in lagarrues_l:
 converted = re.sub(' +', ' ', converted)
 
 with open('lagarrues_to_j++_output.txt', 'w', encoding='utf-8') as file:
-    converted = re.sub(' \$ ', '\n', converted)
+    converted = re.sub('\$ ', '\n', converted)
     file.write(converted)
 
 print('轉換成功！已輸出到 lagarrues_to_j++_output.txt')
