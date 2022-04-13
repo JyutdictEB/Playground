@@ -8,11 +8,6 @@
 // Author: @以成
 // Date: 2021-11-01
 
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-})
-
 const 其它字符正則匹配 = `^[^a-zA-Z0-9]`
 const 單字粵拼正則匹配 = `^[a-zA-Z](.*?)[0-9][0-9']?`
 const 聲母正則匹配 = `^(n[jg]?|bb?|dd?|[zcs][hrjl]?|[ptg]h?|[gk][wv]?|[hmqfvwjl])(?=[aeoiuy])`
@@ -52,8 +47,8 @@ const 粵拼數字調號轉爲符號調號 = (待轉換粵拼) => {
         // console.log('聲母：' + 聲母 + '　輔音韻尾：' + 輔音韻尾 + '　聲調：' + 聲調)
         // 提取元音們
         let 元音們 = (輔音韻尾 !== '' || 聲調 !== '') ?
-                    當前單字.slice(聲母.length, -(輔音韻尾.length + 聲調.length)) :
-                    當前單字.slice(聲母.length)
+            當前單字.slice(聲母.length, -(輔音韻尾.length + 聲調.length)) :
+            當前單字.slice(聲母.length)
         // 逐個提取元音
         let 提取出的元音們 = []
         while (元音們.length > 0) {
@@ -73,16 +68,48 @@ const 粵拼數字調號轉爲符號調號 = (待轉換粵拼) => {
         }
         提取出的元音們 = 提取出的元音們.join('')
         // 合併到結果
-        let 轉換後單字 =  聲母 + 提取出的元音們 + 輔音韻尾
+        let 轉換後單字 = 聲母 + 提取出的元音們 + 輔音韻尾
         // console.log('轉換後單字：' + 轉換後單字)
         轉換後粵拼 += 轉換後單字
         待轉換粵拼 = 待轉換粵拼.slice(當前單字.length)
     }
-    console.log(轉換後粵拼)
+
+    return 轉換後粵拼
 }
 
-readline.question(`請輸入文本：`, 待轉換粵拼 => {
-    粵拼數字調號轉爲符號調號(待轉換粵拼)
-    
-    readline.close()
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+
+readline.question(`1：Terminal；\n2：文件「io-files/zzldfl-input.txt」\n請選擇輸入方式：`, 輸入方式 => {
+    if (輸入方式 === '1') {
+        readline.question(`請輸入文本：`, 待轉換粵拼 => {
+            console.log(粵拼數字調號轉爲符號調號(待轉換粵拼))
+
+            readline.close()
+        })
+    } else if (輸入方式 === '2') {
+        const fs = require('fs')
+        let 轉換結果 = ''
+
+        console.log('文本將會從「io-files/zzldfl-input.txt」讀入')
+
+        try {
+            const 待轉換粵拼 = fs.readFileSync('io-files/zzldfl-input.txt', 'utf8')
+            轉換結果 = 粵拼數字調號轉爲符號調號(待轉換粵拼)
+        } catch (err) {
+            console.error(err)
+        }
+
+        console.log('文本將會向「io-files/zzldfl-output.txt」輸出')
+
+        try {
+            fs.writeFileSync('io-files/zzldfl-output.txt', 轉換結果)
+        } catch (err) {
+            console.error(err)
+        }
+
+        readline.close()
+    }
 })
